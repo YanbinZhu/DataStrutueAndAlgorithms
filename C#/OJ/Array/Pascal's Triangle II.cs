@@ -1,34 +1,15 @@
 public class Solution {
     public IList<int> GetRow(int rowIndex) {
         
-        IList<int> temp=new List<int>();
+         var arr = new int[rowIndex + 1];
         
-        if(rowIndex == 0)
-        {
-            temp.Add(1);
-            return temp;
-        }
-        
-        if(rowIndex==1)
-        {
-            
-             temp.Add(1);
-             temp.Add(1);
-            return temp;
-        }
-        
-        temp.Add(1);
-        
-        var pre = GetRow(rowIndex - 1);
-        
-        for(int i = 1; i < rowIndex;  i++)
-        {
-            temp.Add(pre[i-1] + pre[i]);
-        }
-        
-        temp.Add(1);
-        
-        return temp;
+        arr[0] = 1;
+
+        for (int i = 1; i <= rowIndex; i++) 
+            for (int j = i; j > 0; j--) 
+                arr[j] = arr[j] + arr[j - 1];
+
+        return new List<int>(arr);
         
     }
 }

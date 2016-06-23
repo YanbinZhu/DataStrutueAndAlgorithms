@@ -1,123 +1,91 @@
-/* Reverse Nodes in k-Group
-     Given a linked list, reverse the nodes of a linked list k at a time and return its modified list.
-
-If the number of nodes is not a multiple of k then left-out nodes in the end should remain as it is.
-
-You may not alter the values in the nodes, only nodes itself may be changed.
-
-Only constant memory is allowed.
-
-For example,
-Given this linked list: 1->2->3->4->5
-
-For k = 2, you should return: 2->1->4->3->5
-
-For k = 3, you should return: 3->2->1->4->5*/
-    
-    
-    
-    /**
+/**
  * Definition for singly-linked list.
  * public class ListNode {
  *     public int val;
- *     public ListNode next;
- *     public ListNode(int x) { val = x; }
- * }
- */
-public class SmallList{
-    
-    public ListNode head;
-    
-    public ListNode tail;
-    
-    public SmallList(ListNode head, ListNode tail)
-    {
-        head=head;
-        tail=tail;
-    }
-}
+*     public ListNode next;
+*     public ListNode(int x) { val = x; }
+* }
+*/
+/*
+3 steps:
+1. divide linked list into k length group;
+2. reverse k length group;
+3. Link  the reversed k length group;
+4. the very last one will be tricky, need to check whether its length is less or larger than k.
 
-
+*/
 
 public class Solution {
     public ListNode ReverseKGroup(ListNode head, int k) {
-        //check null and single node
-        if(head==null||head.next==null)
-            return head;
-        
-        var runner=head;
-        var counter=1;
-        var smallList=new List<ListNode>();
-        smallList.Add(head);
-        //split list node into separated list
+
+        var KlengthList=new List<ListNode>();
+
+        //divide the list into group
+
+        KlengthList.Add(head);
+
+        var runner = head;
+        var newHeader=head;
+        int length = 1;
+
         while(runner!=null)
         {
-            if(counter==k)
+            if(length == k)
             {
+                KlengthList.Add(runner.next);
+                length = 1;
                 var temp=runner.next;
-                runner.next = null;
-                runner = temp;
-                smallList.Add(temp);
-                counter = 1;
+                runner.next=null;
+                runner=temp;
                 continue;
             }
-            
-            counter += 1;
+
+            length += 1;
             runner = runner.next;
         }
-        
-        smallList.Add(runner);
-        
-        if(smallList.Count==1 && counter < k)
+
+        var KlengthListEnd=new List<ListNode>();
+
+        //reverse k length list
+
+        for(int i = 0; i < KlengthList.Count - 1;i++)
         {
-            return head;
+            KlengthListEnd.Add(ReverseList(KlengthList[i]));
         }
-        
-        var reversedSmalllist=new List<SmallList>();
-        //reverse small list
-        
-        for(int i =0; i < smallList.Count-1; i++)
+
+        if(length == k + 1)
         {
-            reversedSmalllist.Add(ReverseSmallList(smallList[i]));
-        }
-        
-        for(int i =1; i < smallList.Count - 2; i++)
-        {
-            reversedSmalllist[i].tail.next = reversedSmalllist[i+1].head;
-        }
-        
-        if(counter == 2)
-        {
-            reversedSmalllist[smallList.Count - 1].tail.next = reversedSmalllist[smallList.Count-1].head;
+           KlengthListEnd.Add(ReverseList(KlengthList[KlengthList.Count - 1]));
         }
         else
         {
-            
-            reversedSmalllist[smallList.Count - 1].tail.next = reversedSmalllist[smallList.Count-1].head;
+            KlengthListEnd.Add(KlengthList[KlengthList.Count - 1]);
         }
-        
-        //return 
-        
-        return reversedSmalllist[0].head;
+
+        //link reversed list together
+
+        for(int i = 0; i < KlengthList.Count - 1;i++)
+        {
+            KlengthList[i].next = KlengthListEnd[i + 1];
+        }
+
+        return KlengthListEnd[0];
     }
-    
-    public SmallList ReverseSmallList(ListNode head)
+
+    public ListNode ReverseList(ListNode head)
     {
-        ListNode newHeader=null;
-        var pre=newHeader;
-        var cur=head;
-        var next=head.next;
+        ListNode newHead=null;
+
+        var next=head;
+
         while(next!=null)
         {
             var temp=next.next;
-            next.next=cur;
-            cur.next=pre;
-            pre=cur;
-            cur=next;
+            next.next=newHead;
+            newHead=next;
             next=temp;
         }
-        
-        return new SmallList(cur, head);
+
+        return newHead;
     }
-    
 }
